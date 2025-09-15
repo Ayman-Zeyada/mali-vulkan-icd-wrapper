@@ -1,7 +1,7 @@
 {
     "file_format_version": "1.0.0",
     "ICD": {
-        "library_path": "/media/ayman/data/Projects/mali-vulkan-icd-wrapper/build/libmali_extension_wrapper.so",
+        "library_path": "",
         "api_version": "1.3.276"
     }
 }
