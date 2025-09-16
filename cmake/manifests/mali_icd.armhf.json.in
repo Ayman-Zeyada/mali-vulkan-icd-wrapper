@@ -1,0 +1,7 @@
+{
+    "file_format_version": "1.0.0",
+    "ICD": {
+        "library_path": "/usr/lib/arm-linux-gnueabihf/libmali_wrapper.so",
+        "api_version": "@API_VERSION@"
+    }
+}

@@ -1,0 +1,12 @@
+#pragma once
+
+// Mali Vulkan ICD Wrapper - Build-time Configuration
+// Generated automatically by CMake - DO NOT EDIT
+
+namespace mali_wrapper {
+
+// Build-time configuration paths - Mali driver only
+constexpr const char* MALI_DRIVER_PATH = "@MALI_DRIVER_PATH@";
+constexpr const char* API_VERSION = "@API_VERSION@";
+
+} // namespace mali_wrapper
