@@ -9,11 +9,16 @@ option(BUILD_32BIT "Build 32-bit wrapper" ON)
 option(BUILD_64BIT "Build 64-bit wrapper" ON)
 option(INSTALL_ICDS "Install ICD manifests" ON)
 
-# Path configuration options - Mali driver only
+# Path configuration options
 set(MALI_DRIVER_PATH_64 "/usr/lib/aarch64-linux-gnu/libmali-backend.so"
     CACHE STRING "Path to 64-bit Mali driver")
 set(MALI_DRIVER_PATH_32 "/usr/lib/arm-linux-gnueabihf/libmali-backend.so"
     CACHE STRING "Path to 32-bit Mali driver")
+
+set(WSI_LAYER_PATH_64 "/usr/lib/aarch64-linux-gnu/vulkan/implicit_layer.d/libVkLayer_window_system_integration.so"
+    CACHE STRING "Path to 64-bit WSI layer")
+set(WSI_LAYER_PATH_32 "/usr/lib/arm-linux-gnueabihf/vulkan/implicit_layer.d/libVkLayer_window_system_integration.so"
+    CACHE STRING "Path to 32-bit WSI layer")
 
 # API version
 set(API_VERSION "1.3.276" CACHE STRING "Vulkan API version")
@@ -54,9 +59,11 @@ function(create_wrapper_target ARCH_NAME ARCH_FLAGS)
     # Set architecture-specific paths
     if(ARCH_NAME STREQUAL "aarch64")
         set(MALI_DRIVER_PATH ${MALI_DRIVER_PATH_64})
+        set(WSI_LAYER_PATH ${WSI_LAYER_PATH_64})
         set(INSTALL_DIR "lib/aarch64-linux-gnu")
     elseif(ARCH_NAME STREQUAL "armhf")
         set(MALI_DRIVER_PATH ${MALI_DRIVER_PATH_32})
+        set(WSI_LAYER_PATH ${WSI_LAYER_PATH_32})
         set(INSTALL_DIR "lib/arm-linux-gnueabihf")
     else()
         message(FATAL_ERROR "Unknown architecture: ${ARCH_NAME}")

@@ -10,6 +10,7 @@ bool InitializeWrapper();
 // Shutdown the wrapper ICD
 void ShutdownWrapper();
 
+// Internal function declarations - removed since function is static
 
 } // namespace mali_wrapper
 

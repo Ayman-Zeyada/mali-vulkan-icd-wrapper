@@ -5,8 +5,9 @@
 
 namespace mali_wrapper {
 
-// Build-time configuration paths - Mali driver only
+// Build-time configuration paths
 constexpr const char* MALI_DRIVER_PATH = "@MALI_DRIVER_PATH@";
+constexpr const char* WSI_LAYER_PATH = "@WSI_LAYER_PATH@";
 constexpr const char* API_VERSION = "@API_VERSION@";
 
 } // namespace mali_wrapper

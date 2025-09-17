@@ -17,18 +17,32 @@ LibraryLoader::~LibraryLoader() {
 }
 
 bool LibraryLoader::LoadLibraries() {
-    LOG_INFO("Loading Mali driver with build-time configuration");
+    LOG_INFO("Loading Mali driver and WSI layer with build-time configuration");
     LOG_DEBUG("Mali driver: " + std::string(MALI_DRIVER_PATH));
+    LOG_DEBUG("WSI layer: " + std::string(WSI_LAYER_PATH));
 
     if (!LoadMaliDriver(MALI_DRIVER_PATH)) {
         return false;
     }
 
-    LOG_INFO("Successfully loaded Mali driver");
+    if (!LoadWSILayer(WSI_LAYER_PATH)) {
+        LOG_ERROR("Failed to load WSI layer, initialization aborted");
+        return false;
+    }
+
+    LOG_INFO("Successfully loaded Mali driver and WSI layer");
     return true;
 }
 
 void LibraryLoader::UnloadLibraries() {
+    if (wsi_handle_) {
+        dlclose(wsi_handle_);
+        wsi_handle_ = nullptr;
+        wsi_get_instance_proc_addr_ = nullptr;
+        wsi_get_device_proc_addr_ = nullptr;
+        wsi_negotiate_interface_ = nullptr;
+    }
+
     if (mali_handle_) {
         dlclose(mali_handle_);
         mali_handle_ = nullptr;
@@ -36,7 +50,7 @@ void LibraryLoader::UnloadLibraries() {
         mali_create_instance_ = nullptr;
     }
 
-    LOG_DEBUG("Mali driver unloaded");
+    LOG_DEBUG("Mali driver and WSI layer unloaded");
 }
 
 bool LibraryLoader::LoadMaliDriver(const std::string& path) {
@@ -104,6 +118,46 @@ PFN_vkVoidFunction LibraryLoader::GetMaliProcAddr(const char* name) {
     return nullptr;
 }
 
+bool LibraryLoader::LoadWSILayer(const std::string& path) {
+    wsi_handle_ = LoadLibrary(path);
+    if (!wsi_handle_) {
+        LOG_ERROR("Failed to load WSI layer: " + path);
+        return false;
+    }
 
+    // Get the layer negotiation function
+    wsi_negotiate_interface_ = reinterpret_cast<PFN_wsi_layer_vkNegotiateLoaderLayerInterfaceVersion>(
+        GetSymbol(wsi_handle_, "wsi_layer_vkNegotiateLoaderLayerInterfaceVersion"));
+    if (!wsi_negotiate_interface_) {
+        LOG_ERROR("Failed to get negotiation interface from WSI layer");
+        return false;
+    }
+
+    // Create negotiation structure
+    VkNegotiateLayerInterface negotiate_struct = {};
+    negotiate_struct.sType = LAYER_NEGOTIATE_INTERFACE_STRUCT;
+    negotiate_struct.loaderLayerInterfaceVersion = 2;  // We support version 2
+    negotiate_struct.pNext = nullptr;
+
+    VkResult result = wsi_negotiate_interface_(&negotiate_struct);
+    if (result != VK_SUCCESS) {
+        LOG_ERROR("WSI layer interface negotiation failed: " + std::to_string(result));
+        return false;
+    }
+
+    LOG_DEBUG("WSI layer interface version negotiated: " + std::to_string(negotiate_struct.loaderLayerInterfaceVersion));
+
+    // Get function pointers from negotiation result
+    wsi_get_instance_proc_addr_ = negotiate_struct.pfnGetInstanceProcAddr;
+    wsi_get_device_proc_addr_ = negotiate_struct.pfnGetDeviceProcAddr;
+
+    if (!wsi_get_instance_proc_addr_ || !wsi_get_device_proc_addr_) {
+        LOG_ERROR("WSI layer negotiation returned null function pointers");
+        return false;
+    }
+
+    LOG_INFO("WSI layer loaded and negotiated successfully");
+    return true;
+}
 
 } // namespace mali_wrapper
