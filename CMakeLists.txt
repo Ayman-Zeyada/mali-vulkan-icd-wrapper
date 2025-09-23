@@ -55,7 +55,10 @@ find_library(XRANDR_LIBRARY Xrandr REQUIRED)
 # Generate Wayland protocol headers
 find_program(WAYLAND_SCANNER_EXEC wayland-scanner REQUIRED)
 pkg_check_modules(WAYLAND_PROTOCOLS REQUIRED wayland-protocols)
-pkg_get_variable(WAYLAND_PROTOCOLS_DIR wayland-protocols pkgdatadir)
+# Use cached value from toolchain if set, otherwise query pkg-config
+if(NOT WAYLAND_PROTOCOLS_DIR)
+    pkg_get_variable(WAYLAND_PROTOCOLS_DIR wayland-protocols pkgdatadir)
+endif()
 
 add_custom_target(wayland_generated_files
     COMMAND ${WAYLAND_SCANNER_EXEC} client-header

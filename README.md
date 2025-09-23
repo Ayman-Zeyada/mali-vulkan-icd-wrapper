@@ -66,19 +66,17 @@ sudo rm -f /usr/share/vulkan/implicit_layer.d/VkLayer_window_system_integration.
 sudo dpkg --add-architecture armhf
 sudo apt update
 
-# Essential build tools
-sudo apt install build-essential cmake pkg-config libvulkan-dev
-
-# Window system support
-sudo apt install libwayland-dev libx11-dev libx11-xcb-dev libdrm-dev
-sudo apt install libxcb-shm0-dev libxcb-present-dev libxcb-sync-dev
-sudo apt install libxrandr-dev wayland-protocols
+# Essential build tools and window system support
+sudo apt install build-essential cmake pkg-config libvulkan-dev \
+  libwayland-dev libx11-dev libx11-xcb-dev libdrm-dev \
+  libxcb-shm0-dev libxcb-present-dev libxcb-sync-dev libxcb-dri3-dev \
+  libxrandr-dev wayland-protocols
 
 # For 32-bit builds
-sudo apt install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
-sudo apt install libdrm-dev:armhf libwayland-dev:armhf libx11-dev:armhf
-sudo apt install libx11-xcb-dev:armhf libxcb-shm0-dev:armhf
-sudo apt install libxcb-present-dev:armhf libxcb-sync-dev:armhf libxrandr-dev:armhf
+sudo apt install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf \
+  libvulkan-dev:armhf libdrm-dev:armhf libwayland-dev:armhf libx11-dev:armhf \
+  libx11-xcb-dev:armhf libxcb-shm0-dev:armhf \
+  libxcb-present-dev:armhf libxcb-sync-dev:armhf libxrandr-dev:armhf
 ```
 
 ### Build and Install
