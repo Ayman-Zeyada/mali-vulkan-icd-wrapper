@@ -43,12 +43,19 @@ sudo ln -sf /usr/lib/arm-linux-gnueabihf/libmali-valhall-g610-g24p0-wayland-gbm.
            /usr/lib/arm-linux-gnueabihf/libmali.so
 ```
 
-#### Remove Conflicting WSI Layer
+#### Remove Conflicting Mali ICD (CRITICAL)
+
+**Most important:** Remove the default Mali ICD that gets installed with the driver package:
 
 ```bash
-# Remove standalone WSI layer to avoid conflicts (if installed)
+# Remove default Mali ICD (installed by .deb package) - THIS IS CRITICAL
+sudo rm -f /usr/share/vulkan/icd.d/mali.json
+
+# Also remove standalone WSI layer to avoid conflicts (if installed)
 sudo rm -f /usr/share/vulkan/implicit_layer.d/VkLayer_window_system_integration.json
 ```
+
+**Environment Variables:** Make sure no Vulkan environment variables are set (like `VK_ICD_FILENAMES`) unless you specifically want to override ICD selection.
 
 ### Prerequisites
 
